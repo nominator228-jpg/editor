@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nikita · Video Editor &amp; AI Video Creator</title>
+<meta property="og:title" content="Nikita · AI Content Creator">
+<meta property="og:description" content="AI video and image: Seedance 2.5, Nano Banana, Higgsfield, ComfyUI, character LoRA">
+<meta property="og:image" content="https://nominator228-jpg.github.io/editor/media/primerka_final.jpg">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one narrow column like a Telegram post feed; sections read as "nodes" with typed input/output labels. */
+:root{
+  --bg:#16191e; --panel:#1f2329; --fg:#e8e6e1; --muted:#9aa1ab; --line:#30353d;
+  --ginger:#e9834c; --wire:#7fa7e0; --chip:#2a2f36; --code:#1a1d22;
+  --display:"Unbounded","Manrope",system-ui,sans-serif;
+  --body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.55 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:44px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:clamp(26px,6vw,38px);font-weight:700}
+h2{font-size:21px;font-weight:600}
+h3{font-size:15px;font-weight:600;font-family:var(--body)}
+p{margin:0}
+a{color:var(--wire)}
+a:focus-visible,video:focus-visible{outline:2px solid var(--ginger);outline-offset:2px}
+.eyebrow{font:600 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ginger)}
+.muted{color:var(--muted)}
+section{display:flex;flex-direction:column;gap:16px}
+.head{display:flex;flex-direction:column;gap:12px}
+.role{font:500 15px/1.4 var(--mono);color:var(--muted)}
+.contacts{display:flex;flex-wrap:wrap;gap:8px}
+.contacts span,.contacts a{font:13px/1 var(--mono);background:var(--chip);padding:8px 10px;border-radius:6px;color:var(--fg);text-decoration:none}
+.contacts a{color:var(--wire)}
+.lead{font-size:17px}
+.wins{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.win{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.win b{font-family:var(--mono);font-size:12px;color:var(--ginger);letter-spacing:.04em;text-transform:uppercase}
+.win p{font-size:14px}
+ul.tight{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+/* pipeline as node chain */
+.flow{display:flex;flex-direction:column;gap:0}
+.node{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;grid-template-columns:1fr;gap:4px;min-width:0}
+.node .t{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.node .t h3{font-size:15px}
+.node .tool{font:12px/1.3 var(--mono);color:var(--wire)}
+.node p{font-size:14px;color:var(--muted)}
+.wire{height:18px;width:2px;background:var(--wire);margin-left:22px;position:relative}
+.wire::after{content:"";position:absolute;bottom:-3px;left:-3px;width:8px;height:8px;border-radius:50%;background:var(--wire)}
+/* videos */
+.reels{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.reel{display:flex;flex-direction:column;gap:6px;min-width:0}
+.reel video{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:10px;background:var(--chip);display:block}
+.reel p{font-size:13px;line-height:1.4}
+.reel .badge{align-self:flex-start;font:600 11px/1.2 var(--mono);color:var(--bg);background:var(--ginger);padding:5px 7px;border-radius:4px}
+.reel .k{font:11px/1.2 var(--mono);color:var(--ginger);text-transform:uppercase;letter-spacing:.06em}
+/* stills */
+.strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}
+.strip img{height:260px;width:auto;border-radius:8px;scroll-snap-align:start;flex:none;max-width:none}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.fact{background:var(--chip);border-radius:8px;padding:10px 12px;font-size:13px;min-width:0}
+.fact b{display:block;font:600 12px/1.3 var(--mono);color:var(--fg);margin-bottom:2px}
+.ds{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ds img{height:150px;width:auto;border-radius:6px}
+.ds .arrow{font:600 13px var(--mono);color:var(--wire)}
+/* graphs */
+.graph{display:flex;flex-direction:column;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+.graph img{width:100%;border-radius:6px;display:block;cursor:zoom-in}
+.graph .nodes{display:flex;flex-wrap:wrap;gap:6px}
+.graph .nodes span{font:11px/1 var(--mono);padding:6px 8px;border-radius:5px;background:var(--chip);color:var(--wire)}
+.graph p{font-size:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+/* api map */
+.api{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.chain{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.chain ol{margin:0;padding-left:18px;font-size:14px;display:flex;flex-direction:column;gap:4px}
+.chain code{font:12px var(--mono);color:var(--wire)}
+/* code */
+.codebox{overflow-x:auto;background:var(--code);border:1px solid var(--line);border-radius:10px}
+pre{margin:0;padding:14px;font:12.5px/1.55 var(--mono);color:var(--fg)}
+.cm{color:var(--muted)} .kw{color:var(--ginger)} .st{color:var(--wire)}
+.mods{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.mod{background:var(--chip);border-radius:8px;padding:10px 12px;font-size:13px}
+.mod b{font:600 12px var(--mono);display:block}
+.mod span{font:12px var(--mono);color:var(--muted)}
+.stack{display:flex;flex-wrap:wrap;gap:6px}
+.stack span{font:12px/1 var(--mono);padding:7px 9px;border-radius:5px;border:1px solid var(--line)}
+.stack span.lvl{border-color:var(--ginger);color:var(--ginger)}
+footer{font-size:13px;color:var(--muted)}
+.quote{margin:0;padding:2px 0 2px 14px;border-left:3px solid var(--ginger);font:500 16px/1.5 var(--body);color:var(--fg)}
+.show{display:grid;grid-template-columns:minmax(0,300px) 1fr;gap:18px;align-items:start}
+.show video{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:12px;background:var(--chip);display:block}
+.show .facts{grid-template-columns:1fr}
+@media (max-width:600px){.show{grid-template-columns:1fr}.show video{max-width:340px;margin:0 auto}}
+/* lightbox */
+#lb{position:fixed;inset:0;background:rgba(10,12,15,.92);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}
+#lb img{max-width:100%;max-height:100%;border-radius:6px}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+@media (max-width:480px){.strip img{height:220px}.ds img{height:120px}}
+</style>
+<div class="wrap">
+
+<header class="head">
+  <span class="eyebrow">Portfolio · Video editing &amp; AI video</span>
+  <h1>Nikita</h1>
+  <p class="role">Video Editor · AI Video Creator · Premiere Pro · After Effects · DaVinci · Seedance · Higgsfield</p>
+  <div class="contacts">
+    <a href="mailto:nominator228@gmail.com">nominator228@gmail.com</a>
+    <a href="https://t.me/Nikita_Parhim4ik" target="_blank" rel="noopener">Telegram: @Nikita_Parhim4ik</a>
+    <span>Remote · UTC+7 · English C1</span>
+  </div>
+  <p class="lead">3+ years of commercial video editing, plus a year of hands-on AI video generation. I cut short-form and long-form, grade, add titles and sound, and when a shot is missing I generate it, so AI inserts sit seamlessly next to real footage.</p>
+</header>
+
+<section>
+  <span class="eyebrow">Editing</span>
+  <h2>Recent edits</h2>
+  <div class="reels">
+    <div class="reel"><video src="media/edit_boxer.mp4" poster="media/edit_boxer.jpg" controls muted playsinline preload="none"></video><span class="k">Boxer promo</span><p>Full post-production: edit, color grade, sound, titles.</p></div>
+    <div class="reel"><video src="media/edit_clip.mp4" poster="media/edit_clip.jpg" controls muted playsinline preload="none"></video><span class="k">Music video</span><p>Edit, color grade and titles.</p></div>
+    <div class="reel"><video src="media/edit_talking.mp4" poster="media/edit_talking.jpg" controls muted playsinline preload="none"></video><span class="k">Talking head</span><p>Talking-head video for my own blog: cuts, captions, b-roll, screen inserts, motion.</p></div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">AI video</span>
+  <h2>Fully generated, no filming, no vid2vid</h2>
+  <div class="reels">
+    <div class="reel"><video src="media/showcase.mp4" poster="media/showcase.jpg" controls muted playsinline preload="none"></video><span class="k">AI story</span><p>A one-character story: real city streets, a second character, the same face in every shot.</p></div>
+    <div class="reel"><video src="media/trend_final.mp4" poster="media/trend_final.jpg" controls muted playsinline preload="none"></video><span class="k">Trend</span><p>A Reels trend recreated from scratch: every frame and motion generated.</p></div>
+    <div class="reel"><video src="media/primerka_final.mp4" poster="media/primerka_final.jpg" controls muted playsinline preload="none"></video><span class="k">Try-on</span><p>One character, a series of outfits; face, outfit and pose held from references.</p></div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">What I bring</span>
+  <div class="wins">
+    <div class="win"><b>Editing</b><p>Premiere Pro, After Effects, DaVinci Resolve. Pacing, hooks, color, captions, sound design. Familiar with editing direction; I have directed and produced a short social series.</p></div>
+    <div class="win"><b>AI video</b><p>Seedance 2.5 (main), Kling, Veo, Nano Banana, Higgsfield, Magnific. For complex camera moves I build a simple 3D scene and feed its render to Seedance as a motion reference.</p></div>
+    <div class="win"><b>Consistent characters</b><p>Character LoRAs and ComfyUI workflows: the same face across locations, outfits and shots. Realistic AI UGC and talking heads.</p></div>
+    <div class="win"><b>Automated editing</b><p>Agent-driven editing in Remotion and HyperFrames: I can turn a repeatable format into a pipeline, so volume grows without losing quality.</p></div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">Rates</span>
+  <div class="facts">
+    <div class="fact"><b>Edit</b>$15–40 per video, depending on length and complexity</div>
+    <div class="fact"><b>AI inserts / AI video</b>$15/hour + generation costs</div>
+    <div class="fact"><b>Volume / retainer</b>monthly packages and pipelines on request</div>
+  </div>
+</section>
+
+<footer>Contact: nominator228@gmail.com · Telegram @Nikita_Parhim4ik</footer>
+</div>
+<script>
+document.querySelectorAll('video').forEach(v=>v.addEventListener('play',()=>{document.querySelectorAll('video').forEach(o=>{if(o!==v)o.pause()})}));
+</script>
+
+<script>
+try{const tg=window.Telegram&&Telegram.WebApp;if(tg&&tg.initData!==undefined){tg.ready();tg.expand();
+tg.setHeaderColor('#16191e');tg.setBackgroundColor('#16191e');}}catch(e){}
+</script>
+</body>
+</html>
